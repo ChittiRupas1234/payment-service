@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="application-0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/payments/application/0.0.1-SNAPSHOT/application-0.0.1-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

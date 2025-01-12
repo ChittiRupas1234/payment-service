@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.payments</groupId>
-	<artifactId>application</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>payments</artifactId>
+	<version>0.0.1</version>
 	<name>payment application</name>
 	<description>Payment Service Application</description>
 	<url/>

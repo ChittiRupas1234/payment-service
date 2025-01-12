@@ -5,15 +5,12 @@ import com.payments.application.dto.TopupRequest;
 import com.payments.application.dto.TransferRequest;
 import com.payments.application.dto.WithdrawRequest;
 import com.payments.application.entity.Wallet;
-import com.payments.application.entity.WalletTransaction;
 import com.payments.application.repository.WalletRepository;
-import com.payments.application.repository.WalletTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -21,9 +18,6 @@ public class WalletService {
 
     @Autowired
     private WalletRepository walletRepository;
-
-    @Autowired
-    private WalletTransactionRepository walletTransactionRepository;
 
     @Autowired
     private TokenValidationService tokenValidationService;
@@ -53,8 +47,7 @@ public class WalletService {
         wallet.setBalance(wallet.getBalance().add(amount));
         Wallet updatedWallet = walletRepository.save(wallet);
 
-        logTransaction(null, walletId, amount, "TOPUP");
-        kafkaTemplate.send("Topup",request);
+        kafkaTemplate.send("Topup", request);
         return updatedWallet;
     }
 
@@ -74,7 +67,6 @@ public class WalletService {
         walletRepository.save(fromWallet);
         walletRepository.save(toWallet);
 
-        logTransaction(fromWalletId, toWalletId, amount, "TRANSFER");
 
         // Publish the transfer request JSON to the "Transfer" topic
         kafkaTemplate.send("Transfer", request);
@@ -99,7 +91,6 @@ public class WalletService {
         wallet.setBalance(wallet.getBalance().subtract(amount));
         Wallet updatedWallet = walletRepository.save(wallet);
 
-        logTransaction(walletId, null, amount, "WITHDRAWAL");
 
         // Publish the withdrawal request JSON to the "Withdrawal" topic
         kafkaTemplate.send("Withdrawal", request);
@@ -111,16 +102,6 @@ public class WalletService {
         if (!tokenValidationService.validateToken(token)) {
             throw new RuntimeException("Invalid Token");
         }
-    }
-
-    private void logTransaction(UUID fromWalletId, UUID toWalletId, BigDecimal amount, String transactionType) {
-        WalletTransaction transaction = new WalletTransaction();
-        transaction.setFromWalletId(fromWalletId);
-        transaction.setToWalletId(toWalletId);
-        transaction.setAmount(amount);
-        transaction.setTransactionType(transactionType);
-        transaction.setTransactionDate(LocalDateTime.now());
-        walletTransactionRepository.save(transaction);
     }
 }
 
