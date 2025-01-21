@@ -5,6 +5,7 @@ import com.payments.application.dto.TopupRequest;
 import com.payments.application.dto.TransferRequest;
 import com.payments.application.dto.WithdrawRequest;
 import com.payments.application.entity.Wallet;
+import com.payments.application.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class WalletService {
         wallet.setBalance(wallet.getBalance().add(amount));
         Wallet updatedWallet = walletRepository.save(wallet);
 
+        kafkaTemplate.send("Topup", request);
         return updatedWallet;
     }
 
@@ -68,6 +70,7 @@ public class WalletService {
 
         // Publish the transfer request JSON to the "Transfer" topic
         kafkaTemplate.send("Transfer", request);
+
     }
 
     public BigDecimal getBalance(String token, UUID walletId) {
