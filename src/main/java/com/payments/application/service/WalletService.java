@@ -6,6 +6,7 @@ import com.payments.application.dto.TransferRequest;
 import com.payments.application.dto.WithdrawRequest;
 import com.payments.application.entity.Wallet;
 import com.payments.application.repository.WalletRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class WalletService {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Wallet not found"));
         wallet.setBalance(wallet.getBalance().add(amount));
         Wallet updatedWallet = walletRepository.save(wallet);
+
 
         kafkaTemplate.send("Topup", request);
         return updatedWallet;
